@@ -1,4 +1,7 @@
+import { defineQuery } from 'groq';
 import { defineField, defineType } from 'sanity';
+
+import { env } from '@/config/env';
 
 export default defineType({
   name: 'category',
@@ -36,13 +39,17 @@ export default defineType({
           .integer()
           .positive()
           .custom(async (order, { getClient }) => {
-            const client = getClient({ apiVersion: '2025-08-18' });
-            const query = '*[_type == "category" && order == $order][0].name';
+            const client = getClient({ apiVersion: env.API_VERSION });
+            const query = defineQuery(
+              '*[_type == "category" && order == $order][0].name',
+            );
             const params = { order };
             const existingCategory = await client.fetch(query, params);
+
             if (existingCategory) {
               return `Order must be unique. "${existingCategory}" is already using order ${order}`;
             }
+
             return true;
           }),
     }),

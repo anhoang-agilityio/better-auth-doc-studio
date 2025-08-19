@@ -1,6 +1,8 @@
+import { defineQuery } from 'groq';
 import { defineField, defineType } from 'sanity';
 
-import { Article } from '../sanity.types';
+import { env } from '@/config/env';
+import { Article } from '@/generated/sanity.types';
 
 export default defineType({
   name: 'article',
@@ -56,14 +58,18 @@ export default defineType({
           .custom(async (order, { getClient, document }) => {
             const article = document as Article;
             const categoryRef = article?.category?._ref;
+
             if (!categoryRef) {
               return true; // No category selected yet
             }
-            const client = getClient({ apiVersion: '2025-08-18' });
-            const query =
-              '*[_type == "article" && order == $order && category._ref == $categoryRef && _id != $documentId][0].title';
+
+            const client = getClient({ apiVersion: env.API_VERSION });
+            const query = defineQuery(
+              '*[_type == "article" && order == $order && category._ref == $categoryRef && _id != $documentId][0].title',
+            );
             const params = { order, categoryRef, documentId: article._id };
             const existingArticle = await client.fetch(query, params);
+
             if (existingArticle) {
               return `Order must be unique per category. "${existingArticle}" is already using order ${order}`;
             }
