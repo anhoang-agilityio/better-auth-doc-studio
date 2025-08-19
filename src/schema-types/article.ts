@@ -35,7 +35,7 @@ export default defineType({
       name: 'content',
       title: 'Content',
       type: 'array',
-      of: [{ type: 'block' }],
+      of: [{ type: 'block' }, { type: 'infoBox' }],
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -64,10 +64,17 @@ export default defineType({
             }
 
             const client = getClient({ apiVersion: env.API_VERSION });
+
+            const currentId = article._id || '';
+            const publishedId = currentId.replace(/^drafts\./, '');
+            const draftId = currentId.startsWith('drafts.')
+              ? currentId
+              : `drafts.${currentId}`;
+
             const query = defineQuery(
-              '*[_type == "article" && order == $order && category._ref == $categoryRef && _id != $documentId][0].title',
+              '*[_type == "article" && order == $order && category._ref == $categoryRef && !(_id in [$draftId, $publishedId])][0].title',
             );
-            const params = { order, categoryRef, documentId: article._id };
+            const params = { order, categoryRef, draftId, publishedId };
             const existingArticle = await client.fetch(query, params);
 
             if (existingArticle) {

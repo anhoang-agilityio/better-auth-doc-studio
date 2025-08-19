@@ -2,6 +2,7 @@ import { defineQuery } from 'groq';
 import { defineField, defineType } from 'sanity';
 
 import { env } from '@/config/env';
+import { Category } from '@/generated/sanity.types';
 
 export default defineType({
   name: 'category',
@@ -38,12 +39,20 @@ export default defineType({
         Rule.required()
           .integer()
           .positive()
-          .custom(async (order, { getClient }) => {
+          .custom(async (order, { getClient, document }) => {
+            const category = document as Category;
             const client = getClient({ apiVersion: env.API_VERSION });
+
+            const currentId = category._id || '';
+            const publishedId = currentId.replace(/^drafts\./, '');
+            const draftId = currentId.startsWith('drafts.')
+              ? currentId
+              : `drafts.${currentId}`;
+
             const query = defineQuery(
-              '*[_type == "category" && order == $order][0].name',
+              '*[_type == "category" && order == $order && !(_id in [$draftId, $publishedId])][0].name',
             );
-            const params = { order };
+            const params = { order, draftId, publishedId };
             const existingCategory = await client.fetch(query, params);
 
             if (existingCategory) {
