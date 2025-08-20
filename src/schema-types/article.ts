@@ -35,7 +35,12 @@ export default defineType({
       name: 'content',
       title: 'Content',
       type: 'array',
-      of: [{ type: 'block' }, { type: 'infoBox' }, { type: 'codeBlock' }],
+      of: [
+        { type: 'block' },
+        { type: 'infoBox' },
+        { type: 'codeBlock' },
+        { type: 'steps' },
+      ],
       validation: (Rule) => Rule.required(),
     }),
     defineField({
