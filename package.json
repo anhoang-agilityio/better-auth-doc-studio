@@ -18,11 +18,11 @@
   ],
   "dependencies": {
     "@sanity/code-input": "^6.0.1",
-    "@sanity/vision": "^4.4.1",
+    "@sanity/vision": "^4.5.0",
     "groq": "^4.4.1",
     "react": "^19.1",
     "react-dom": "^19.1",
-    "sanity": "^4.4.1",
+    "sanity": "^4.5.0",
     "styled-components": "^6.1.18",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "^4.0.17"
