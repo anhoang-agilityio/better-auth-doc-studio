@@ -49,15 +49,9 @@ export default defineType({
       variant: 'variant',
       content: 'content',
     },
-    prepare: ({
-      variant,
-      content,
-    }: {
-      variant: 'info' | 'warning';
-      content: Block[];
-    }) => ({
-      title: variant === 'warning' ? 'Warning' : 'Info',
-      subtitle: portableTextToPlainText(content),
+    prepare: (selection: Record<string, any>) => ({
+      title: selection.variant === 'warning' ? 'Warning' : 'Info',
+      subtitle: portableTextToPlainText(selection.content),
     }),
   },
 });
