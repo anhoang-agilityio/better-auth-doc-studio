@@ -2,7 +2,7 @@ import { defineField, defineType } from 'sanity';
 
 // Shared language alternatives and code options
 const languageAlternatives = [
-  { title: 'Javascript', value: 'jsx' },
+  { title: 'Javascript', value: 'tsx' },
   { title: 'HTML', value: 'html' },
   { title: 'CSS', value: 'css' },
   { title: 'Typescript', value: 'tsx' },
@@ -15,7 +15,6 @@ const languageAlternatives = [
 
 const codeFieldOptions = {
   withFilename: true,
-  language: 'tsx',
   languageAlternatives,
 };
 
