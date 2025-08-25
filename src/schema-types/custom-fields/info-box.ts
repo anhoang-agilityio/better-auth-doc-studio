@@ -1,5 +1,8 @@
 import { defineField, defineType } from 'sanity';
 
+import externalLink from './external-link';
+import internalLink from './internal-link';
+
 type SpanChild = {
   _type: 'span';
   text: string;
@@ -40,7 +43,21 @@ export default defineType({
       name: 'content',
       title: 'Content',
       type: 'array',
-      of: [{ type: 'block' }],
+      of: [
+        {
+          type: 'block',
+          marks: {
+            decorators: [
+              { title: 'Strong', value: 'strong' },
+              { title: 'Emphasis', value: 'em' },
+              { title: 'Code', value: 'code' },
+              { title: 'Underline', value: 'underline' },
+              { title: 'Strike', value: 'strike-through' },
+            ],
+            annotations: [externalLink, internalLink],
+          },
+        },
+      ],
       validation: (Rule) => Rule.required(),
     }),
   ],
