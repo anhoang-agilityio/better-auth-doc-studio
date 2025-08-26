@@ -31,6 +31,16 @@ export default defineType({
       type: 'text',
     }),
     defineField({
+      name: 'icon',
+      title: 'Icon',
+      type: 'file',
+      options: {
+        accept: 'image/svg+xml',
+      },
+      description: 'SVG icon for the category',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'order',
       title: 'Order',
       type: 'number',

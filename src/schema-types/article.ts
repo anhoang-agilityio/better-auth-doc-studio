@@ -32,6 +32,16 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'icon',
+      title: 'Icon',
+      type: 'file',
+      options: {
+        accept: 'image/svg+xml',
+      },
+      description: 'SVG icon for the article',
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'content',
       title: 'Content',
       type: 'portableContent',
