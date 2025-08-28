@@ -30,7 +30,7 @@ export default defineType({
             defineField({
               name: 'content',
               title: 'Content',
-              type: 'portableContent',
+              type: 'stepContent',
               validation: (Rule) => Rule.required(),
             }),
           ],
