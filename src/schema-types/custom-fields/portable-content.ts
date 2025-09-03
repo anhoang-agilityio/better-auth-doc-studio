@@ -24,6 +24,7 @@ const portableContent = defineType({
     { type: 'infoBox' },
     { type: 'codeBlock' },
     { type: 'steps' },
+    { type: 'table' },
   ],
 });
 

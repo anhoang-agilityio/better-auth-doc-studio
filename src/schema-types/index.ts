@@ -5,6 +5,9 @@ import infoBox from './custom-fields/info-box';
 import portableContent from './custom-fields/portable-content';
 import stepContent from './custom-fields/step-content';
 import steps from './custom-fields/steps';
+import table from './custom-fields/table';
+import tableCell from './custom-fields/table-cell';
+import tableRow from './custom-fields/table-row';
 
 export const schemaTypes = [
   article,
@@ -14,4 +17,7 @@ export const schemaTypes = [
   steps,
   stepContent,
   portableContent,
+  table,
+  tableCell,
+  tableRow,
 ];
