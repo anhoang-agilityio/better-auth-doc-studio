@@ -2,11 +2,15 @@ import { z } from 'zod';
 
 const createEnv = () => {
   const EnvSchema = z.object({
-    API_VERSION: z.string(),
+    PROJECT_ID: z.string(),
+    DATASET: z.string(),
+    PREVIEW_URL: z.string(),
   });
 
   const envVars = {
-    API_VERSION: process.env.SANITY_STUDIO_API_VERSION,
+    PROJECT_ID: process.env.SANITY_STUDIO_PROJECT_ID,
+    DATASET: process.env.SANITY_STUDIO_DATASET,
+    PREVIEW_URL: process.env.SANITY_STUDIO_PREVIEW_URL,
   };
 
   const parsedEnv = EnvSchema.safeParse(envVars);

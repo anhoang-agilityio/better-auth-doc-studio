@@ -1,7 +1,7 @@
 import { defineQuery } from 'groq';
 import { defineField, defineType } from 'sanity';
 
-import { env } from '@/config/env';
+import { API_VERSION } from '@/config/constants';
 import { Category } from '@/generated/sanity.types';
 
 export default defineType({
@@ -51,7 +51,7 @@ export default defineType({
           .positive()
           .custom(async (order, { getClient, document }) => {
             const category = document as Category;
-            const client = getClient({ apiVersion: env.API_VERSION });
+            const client = getClient({ apiVersion: API_VERSION });
 
             const currentId = category._id || '';
             const publishedId = currentId.replace(/^drafts\./, '');
