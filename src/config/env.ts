@@ -4,13 +4,11 @@ const createEnv = () => {
   const EnvSchema = z.object({
     PROJECT_ID: z.string(),
     DATASET: z.string(),
-    PREVIEW_URL: z.string(),
   });
 
   const envVars = {
     PROJECT_ID: process.env.SANITY_STUDIO_PROJECT_ID,
     DATASET: process.env.SANITY_STUDIO_DATASET,
-    PREVIEW_URL: process.env.SANITY_STUDIO_PREVIEW_URL,
   };
 
   const parsedEnv = EnvSchema.safeParse(envVars);
