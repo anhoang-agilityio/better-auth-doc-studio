@@ -13,18 +13,170 @@
  */
 
 // Source: schema.json
-export declare const internalGroqTypeReferenceTo: unique symbol;
+export type TableRow = {
+  _type: 'tableRow';
+  cells?: Array<
+    {
+      _key: string;
+    } & TableCell
+  >;
+};
 
-export type Article = {
-  _id: string;
-  _type: 'article';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title: string;
-  slug: Slug;
-  description: string;
-  content: Array<{
+export type TableCell = {
+  _type: 'tableCell';
+  content?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: 'span';
+      _key: string;
+    }>;
+    style?: 'normal';
+    listItem?: never;
+    markDefs?: Array<
+      | {
+          href?: string;
+          _type: 'externalLink';
+          _key: string;
+        }
+      | {
+          article?: {
+            _ref: string;
+            _type: 'reference';
+            _weak?: boolean;
+            [internalGroqTypeReferenceTo]?: 'article';
+          };
+          _type: 'internalLink';
+          _key: string;
+        }
+    >;
+    level?: number;
+    _type: 'block';
+    _key: string;
+  }>;
+};
+
+export type Table = {
+  _type: 'table';
+  headers?: Array<string>;
+  rows?: Array<
+    {
+      _key: string;
+    } & TableRow
+  >;
+  columnSizing?: 'auto' | 'custom';
+  customWidths?: Array<string>;
+};
+
+export type PortableContent = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: 'span';
+        _key: string;
+      }>;
+      style?: 'normal' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
+      listItem?: 'bullet' | 'number';
+      markDefs?: Array<
+        | {
+            href?: string;
+            _type: 'externalLink';
+            _key: string;
+          }
+        | {
+            article?: {
+              _ref: string;
+              _type: 'reference';
+              _weak?: boolean;
+              [internalGroqTypeReferenceTo]?: 'article';
+            };
+            _type: 'internalLink';
+            _key: string;
+          }
+      >;
+      level?: number;
+      _type: 'block';
+      _key: string;
+    }
+  | ({
+      _key: string;
+    } & InfoBox)
+  | ({
+      _key: string;
+    } & CodeBlock)
+  | ({
+      _key: string;
+    } & Steps)
+  | ({
+      _key: string;
+    } & Table)
+>;
+
+export type StepContent = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: 'span';
+        _key: string;
+      }>;
+      style?: 'normal' | 'blockquote';
+      listItem?: 'bullet' | 'number';
+      markDefs?: Array<
+        | {
+            href?: string;
+            _type: 'externalLink';
+            _key: string;
+          }
+        | {
+            article?: {
+              _ref: string;
+              _type: 'reference';
+              _weak?: boolean;
+              [internalGroqTypeReferenceTo]?: 'article';
+            };
+            _type: 'internalLink';
+            _key: string;
+          }
+      >;
+      level?: number;
+      _type: 'block';
+      _key: string;
+    }
+  | ({
+      _key: string;
+    } & InfoBox)
+  | ({
+      _key: string;
+    } & CodeBlock)
+>;
+
+export type Steps = {
+  _type: 'steps';
+  headingLevel?: number;
+  items?: Array<{
+    title?: string;
+    content?: StepContent;
+    _key: string;
+  }>;
+};
+
+export type CodeBlock = {
+  _type: 'codeBlock';
+  useTabs?: boolean;
+  tabs?: Array<{
+    title?: string;
+    code?: Code;
+    _key: string;
+  }>;
+  code?: Code;
+};
+
+export type InfoBox = {
+  _type: 'infoBox';
+  variant?: 'info' | 'warning';
+  content?: Array<{
     children?: Array<{
       marks?: Array<string>;
       text?: string;
@@ -33,22 +185,80 @@ export type Article = {
     }>;
     style?: 'normal' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'blockquote';
     listItem?: 'bullet' | 'number';
-    markDefs?: Array<{
-      href?: string;
-      _type: 'link';
-      _key: string;
-    }>;
+    markDefs?: Array<
+      | {
+          href?: string;
+          _type: 'externalLink';
+          _key: string;
+        }
+      | {
+          article?: {
+            _ref: string;
+            _type: 'reference';
+            _weak?: boolean;
+            [internalGroqTypeReferenceTo]?: 'article';
+          };
+          _type: 'internalLink';
+          _key: string;
+        }
+    >;
     level?: number;
     _type: 'block';
     _key: string;
   }>;
-  category: {
+};
+
+export type Article = {
+  _id: string;
+  _type: 'article';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+  icon?: {
+    asset?: {
+      _ref: string;
+      _type: 'reference';
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: 'sanity.fileAsset';
+    };
+    media?: unknown;
+    _type: 'file';
+  };
+  content?: PortableContent;
+  category?: {
     _ref: string;
     _type: 'reference';
     _weak?: boolean;
     [internalGroqTypeReferenceTo]?: 'category';
   };
-  order: number;
+  subgroup?: {
+    _ref: string;
+    _type: 'reference';
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: 'subgroup';
+  };
+  order?: number;
+};
+
+export type Subgroup = {
+  _id: string;
+  _type: 'subgroup';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  description?: string;
+  category?: {
+    _ref: string;
+    _type: 'reference';
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: 'category';
+  };
+  order?: number;
 };
 
 export type Category = {
@@ -57,10 +267,28 @@ export type Category = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  name: string;
-  slug: Slug;
+  name?: string;
+  slug?: Slug;
   description?: string;
-  order: number;
+  icon?: {
+    asset?: {
+      _ref: string;
+      _type: 'reference';
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: 'sanity.fileAsset';
+    };
+    media?: unknown;
+    _type: 'file';
+  };
+  order?: number;
+};
+
+export type Code = {
+  _type: 'code';
+  language?: string;
+  filename?: string;
+  code?: string;
+  highlightedLines?: Array<number>;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -170,7 +398,7 @@ export type Geopoint = {
 
 export type Slug = {
   _type: 'slug';
-  current: string;
+  current?: string;
   source?: string;
 };
 
@@ -182,8 +410,18 @@ export type SanityAssetSourceData = {
 };
 
 export type AllSanitySchemaTypes =
+  | TableRow
+  | TableCell
+  | Table
+  | PortableContent
+  | StepContent
+  | Steps
+  | CodeBlock
+  | InfoBox
   | Article
+  | Subgroup
   | Category
+  | Code
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -195,3 +433,4 @@ export type AllSanitySchemaTypes =
   | Geopoint
   | Slug
   | SanityAssetSourceData;
+export declare const internalGroqTypeReferenceTo: unique symbol;

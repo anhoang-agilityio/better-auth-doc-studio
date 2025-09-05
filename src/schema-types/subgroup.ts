@@ -1,11 +1,11 @@
 import { defineField, defineType } from 'sanity';
 
 import { API_VERSION } from '@/config/constants';
-import { Category } from '@/generated/sanity.types';
+import { Subgroup } from '@/generated/sanity.types';
 
 export default defineType({
-  name: 'category',
-  title: 'Category',
+  name: 'subgroup',
+  title: 'Subgroup',
   type: 'document',
   fields: [
     defineField({
@@ -30,43 +30,46 @@ export default defineType({
       type: 'text',
     }),
     defineField({
-      name: 'icon',
-      title: 'Icon',
-      type: 'file',
-      options: {
-        accept: 'image/svg+xml',
-      },
-      description: 'SVG icon for the category',
+      name: 'category',
+      title: 'Category',
+      type: 'reference',
+      to: [{ type: 'category' }],
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'order',
       title: 'Order',
       type: 'number',
-      description: 'Used to sort categories. Must be unique.',
+      description:
+        'Used to sort subgroups within a category. Must be unique per category.',
       validation: (Rule) =>
         Rule.required()
           .integer()
           .positive()
           .custom(async (order, { getClient, document }) => {
-            const category = document as Category;
+            const subgroup = document as Subgroup;
+            const categoryRef = subgroup?.category?._ref;
+
+            if (!categoryRef) {
+              return true; // No category selected yet
+            }
+
             const client = getClient({ apiVersion: API_VERSION });
 
-            const currentId = category._id || '';
+            const currentId = subgroup._id || '';
             const publishedId = currentId.replace(/^drafts\./, '');
             const draftId = currentId.startsWith('drafts.')
               ? currentId
               : `drafts.${currentId}`;
 
             const query =
-              '*[_type == "category" && order == $order && !(_id in [$draftId, $publishedId])][0].name';
-            const params = { order, draftId, publishedId };
-            const existingCategory = await client.fetch(query, params);
+              '*[_type == "subgroup" && order == $order && category._ref == $categoryRef && !(_id in [$draftId, $publishedId])][0].name';
+            const params = { order, categoryRef, draftId, publishedId };
+            const existingSubgroup = await client.fetch(query, params);
 
-            if (existingCategory) {
-              return `Order must be unique. "${existingCategory}" is already using order ${order}`;
+            if (existingSubgroup) {
+              return `Order must be unique per category. "${existingSubgroup}" is already using order ${order}`;
             }
-
             return true;
           }),
     }),
@@ -74,7 +77,7 @@ export default defineType({
   preview: {
     select: {
       title: 'name',
-      subtitle: 'description',
+      subtitle: 'category.name',
     },
   },
 });

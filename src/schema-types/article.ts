@@ -1,4 +1,3 @@
-import { defineQuery } from 'groq';
 import { defineField, defineType } from 'sanity';
 
 import { API_VERSION } from '@/config/constants';
@@ -55,11 +54,30 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'subgroup',
+      title: 'Subgroup',
+      type: 'reference',
+      to: [{ type: 'subgroup' }],
+      description: 'Optional subgroup within the category',
+      options: {
+        filter: ({ document }) => {
+          const article = document as Article;
+          const categoryRef = article?.category?._ref;
+          return categoryRef
+            ? {
+                filter: 'category._ref == $categoryRef',
+                params: { categoryRef },
+              }
+            : { filter: '_id == null' }; // Hide all if no category selected
+        },
+      },
+    }),
+    defineField({
       name: 'order',
       title: 'Order',
       type: 'number',
       description:
-        'Used to sort articles within a category. Must be unique per category.',
+        'Used to sort articles within a category or subgroup. Must be unique per category/subgroup.',
       validation: (Rule) =>
         Rule.required()
           .integer()
@@ -67,6 +85,7 @@ export default defineType({
           .custom(async (order, { getClient, document }) => {
             const article = document as Article;
             const categoryRef = article?.category?._ref;
+            const subgroupRef = article?.subgroup?._ref;
 
             if (!categoryRef) {
               return true; // No category selected yet
@@ -80,14 +99,33 @@ export default defineType({
               ? currentId
               : `drafts.${currentId}`;
 
-            const query = defineQuery(
-              '*[_type == "article" && order == $order && category._ref == $categoryRef && !(_id in [$draftId, $publishedId])][0].title',
-            );
-            const params = { order, categoryRef, draftId, publishedId };
+            // Check uniqueness within the same category and subgroup context
+            let query: string;
+            let params: Record<string, unknown>;
+
+            if (subgroupRef) {
+              // If article has a subgroup, check uniqueness within that subgroup
+              query =
+                '*[_type == "article" && order == $order && category._ref == $categoryRef && subgroup._ref == $subgroupRef && !(_id in [$draftId, $publishedId])][0].title';
+              params = {
+                order,
+                categoryRef,
+                subgroupRef,
+                draftId,
+                publishedId,
+              };
+            } else {
+              // If article has no subgroup, check uniqueness among other articles without subgroup in the same category
+              query =
+                '*[_type == "article" && order == $order && category._ref == $categoryRef && !defined(subgroup) && !(_id in [$draftId, $publishedId])][0].title';
+              params = { order, categoryRef, draftId, publishedId };
+            }
+
             const existingArticle = await client.fetch(query, params);
 
             if (existingArticle) {
-              return `Order must be unique per category. "${existingArticle}" is already using order ${order}`;
+              const context = subgroupRef ? 'subgroup' : 'category';
+              return `Order must be unique per ${context}. "${existingArticle}" is already using order ${order}`;
             }
             return true;
           }),
